@@ -2,8 +2,9 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
+const { auth, requireManager } = require("../middlewares/auth"); // ✅ Thêm import
 
-// recommend products for user (simple traversal example)
+// recommend products for user (simple traversal example - Public)
 router.get("/recommend/:userId", async (req, res) => {
   try {
     const userId = `Users/${req.params.userId}`;
@@ -21,8 +22,9 @@ router.get("/recommend/:userId", async (req, res) => {
   }
 });
 
-// fraud detection example: identical reviews (same rating + same comment)
-router.get("/fraud-detection", async (req, res) => {
+// fraud detection example: identical reviews (Admin Only)
+router.get("/fraud-detection", auth, requireManager, async (req, res) => {
+  // ✅ Phân quyền: Yêu cầu Admin
   try {
     const query = `
       FOR r1 IN Reviews

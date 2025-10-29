@@ -1,16 +1,23 @@
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const authRoutes = require("./routes/auth");
-const productRoutes = require("./routes/product");
-const reviewRoutes = require("./routes/review");
+// src/services/api.js (ĐÃ CHỈNH SỬA)
+import axios from "axios";
 
-const app = express();
-app.use(cors());
-app.use(bodyParser.json());
+const apiClient = axios.create({
+  baseURL: "http://localhost:4000/api",
+  headers: { "Content-Type": "application/json" },
+});
 
-app.use("/api/auth", authRoutes);
-app.use("/api/products", productRoutes);
-app.use("/api/reviews", reviewRoutes);
+// ⭐ Interceptor: Tự động đính kèm Token ⭐
+apiClient.interceptors.request.use((config) => {
+  // Thay thế "jwtToken" bằng tên khóa token bạn dùng khi đăng nhập/lưu token.
+  // Ví dụ: Nếu bạn lưu bằng localStorage.setItem("token", ...)
+  const token = localStorage.getItem("token"); // <--- KHẢ NĂNG CAO CẦN SỬA ĐỔI Ở ĐÂY
 
-module.exports = app;
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// ... (phần còn lại của apiClient.interceptors.response.use giữ nguyên)
+
+export default apiClient;
